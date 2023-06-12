@@ -13,6 +13,26 @@ public class Game extends BaseEntity {
     private String title;
     @Column(name = "release_date", columnDefinition = "DATE")
     private Date releaseDate;
+    @Column(name = "dev_id")
+    private Long devId;
+    @Column(name = "description")
+    private String description;
+
+    public Long getDevId() {
+        return devId;
+    }
+
+    public void setDevId(Long devId) {
+        this.devId = devId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Date getReleaseDate() {
         return releaseDate;
@@ -28,10 +48,5 @@ public class Game extends BaseEntity {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    @Override
-    public String toString() {
-        return "Game{" + "title='" + title + '\'' + ", releaseDate=" + releaseDate + '}';
     }
 }

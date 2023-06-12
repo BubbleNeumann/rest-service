@@ -11,24 +11,24 @@ import java.util.List;
 public class GameService implements IEntityService {
 
     @Autowired
-    GameRepository gameRepository;
+    GameRepository repo;
     @Override
     public Game getById(Long id) {
-        return gameRepository.findById(id).orElse(null);
+        return repo.findById(id).orElse(null);
     }
 
     @Override
     public void save(Game game) {
-        gameRepository.save(game);
+        repo.save(game);
     }
 
     @Override
     public void delete(Long id) {
-        gameRepository.deleteById(id);
+        repo.deleteById(id);
     }
 
     @Override
     public List<Game> getAll() {
-        return gameRepository.findAll();
+        return repo.findAll();
     }
 }
