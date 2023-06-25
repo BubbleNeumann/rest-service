@@ -1,7 +1,7 @@
 package com.example.restservice.repository;
 
-import com.example.restservice.model.Tag;
+import com.example.restservice.model.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TagRepository extends JpaRepository<Tag, Long> {
+public interface GameRepo extends JpaRepository<Game, Long> {
 }

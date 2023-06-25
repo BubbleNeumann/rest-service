@@ -1,17 +1,18 @@
 package com.example.restservice.service;
 
 import com.example.restservice.model.Game;
-import com.example.restservice.repository.GameRepository;
+import com.example.restservice.repository.GameRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class GameService implements IEntityService {
+public class GameService implements IEntityService<Game> {
 
     @Autowired
-    GameRepository repo;
+    GameRepo repo;
+
     @Override
     public Game getById(Long id) {
         return repo.findById(id).orElse(null);
