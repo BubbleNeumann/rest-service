@@ -1,92 +1,113 @@
 databaseChangeLog:
   - logicalFilePath: db/changelog/db.changelog-games1.yaml
-  - changeSet:
-      id: 1
-      author: root
-      changes:
-        - createTable:
-            tableName: games
-            columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: title
-                  type: varchar(50)
-                  constraints:
-                    unique: true
-                    nullable: false
-              - column:
-                  name: release_date
-                  type: date
-                  constraints:
-              - column:
-                  name: dev_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_dev_id
-              - column:
-                  name: description
-                  type: varchar(500)
-  - changeSet:
-      id: 2
-      author: root
-      changes:
-        - createTable:
-            tableName: tags
-            columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(50)
-                  constraints:
-                    unique: true
-                    nullable: false
-  - changeSet:
-      id: 3
-      author: root
-      changes:
-        - createTable:
-            tableName: games_tags
-            columns:
-              - column:
-                  name: game_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: tag_id
-                  type: BIGINT
-                  constraints:
-                    nullable: false
-  - changeSet:
-      id: 4
-      author: root
-      changes:
-        - createTable:
-            tableName: developers
-            columns:
-              - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(50)
-                  constraints:
-                    unique: true
-                    nullable: false
+#  - changeSet:
+##      games table (id, title, release_date, description)
+#      id: 1
+#      author: root
+#      changes:
+#        - createTable:
+#            tableName: games
+#            columns:
+#              - column:
+#                  name: id
+#                  type: BIGINT
+#                  autoIncrement: true
+#                  constraints:
+#                    primaryKey: true
+#                    nullable: false
+#              - column:
+#                  name: title
+#                  type: varchar(50)
+#                  constraints:
+#                    unique: true
+#                    nullable: false
+#              - column:
+#                  name: release_date
+#                  type: date
+#                  constraints:
+#              - column:
+#                  name: dev_id
+#                  type: BIGINT
+#                  constraints:
+#                    nullable: false
+#                    foreignKeyName: fk_dev_id
+#              - column:
+#                  name: description
+#                  type: varchar(500)
+#  - changeSet:
+#      id: 2
+#      author: root
+#      changes:
+#        - createTable:
+#            tableName: tags
+#            columns:
+#              - column:
+#                  name: id
+#                  type: BIGINT
+#                  autoIncrement: true
+#                  constraints:
+#                    primaryKey: true
+#                    nullable: false
+#              - column:
+#                  name: name
+#                  type: varchar(50)
+#                  constraints:
+#                    unique: true
+#                    nullable: false
+#  - changeSet:
+#      id: 3
+#      author: root
+#      changes:
+#        - createTable:
+#            tableName: games_tags
+#            columns:
+#              - column:
+#                  name: game_id
+#                  type: BIGINT
+#                  constraints:
+#                    nullable: false
+#              - column:
+#                  name: tag_id
+#                  type: BIGINT
+#                  constraints:
+#                    nullable: false
+#  - changeSet:
+#      id: 4
+#      author: root
+#      changes:
+#        - createTable:
+#            tableName: developers
+#            columns:
+#              - column:
+#                  name: id
+#                  type: BIGINT
+#                  autoIncrement: true
+#                  constraints:
+#                    primaryKey: true
+#                    nullable: false
+#              - column:
+#                  name: name
+#                  type: varchar(50)
+#                  constraints:
+#                    unique: true
+#                    nullable: false
+#  -  changeSet:
+#       id:  5
+#       author: root
+#       changes:
+#         -  dropTable:
+#              tableName: developers
+#              cascadeConstrains: true
+#  -  changeSet:
+#       id:  7
+#       author: root
+#       changes:
+#         - dropColumn:
+#             columnName: dev_id
+#             tableName: games
+#         - addLookupTable:
+#            existingTableName: games
+#            existingColumnName: dev_id
+#            newTableName: developers
+#            newColumnName:  id
+#            newColumnDataType:  char(2)

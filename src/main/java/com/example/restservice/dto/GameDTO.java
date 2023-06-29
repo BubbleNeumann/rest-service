@@ -1,6 +1,5 @@
 package com.example.restservice.dto;
 
-import jakarta.persistence.Column;
 
 import java.util.Date;
 
@@ -49,5 +48,16 @@ public class GameDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "GameDTO{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", devId=" + devId +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

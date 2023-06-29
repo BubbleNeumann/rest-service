@@ -1,8 +1,6 @@
 package com.example.restservice.service;
 
-import com.example.restservice.model.BaseEntity;
 import com.example.restservice.model.Developer;
-import com.example.restservice.model.Game;
 import com.example.restservice.repository.DeveloperRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,7 @@ public class DeveloperService implements IEntityService<Developer> {
 
     @Autowired
     DeveloperRepository repo;
+
     @Override
     public Developer getById(Long id) {
         return repo.findById(id).orElse(null);
@@ -26,11 +25,11 @@ public class DeveloperService implements IEntityService<Developer> {
 
     @Override
     public void delete(Long id) {
-
+        repo.deleteById(id);
     }
 
     @Override
     public List<Developer> getAll() {
-        return null;
+        return repo.findAll();
     }
 }
