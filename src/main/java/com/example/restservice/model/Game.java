@@ -72,4 +72,14 @@ public class Game extends BaseEntity {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "title='" + title + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", dev=" + dev +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

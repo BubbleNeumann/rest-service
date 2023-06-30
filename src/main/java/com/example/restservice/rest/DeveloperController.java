@@ -3,7 +3,14 @@ package com.example.restservice.rest;
 import com.example.restservice.dto.DevDTO;
 import com.example.restservice.dto.GameDTO;
 import com.example.restservice.model.Developer;
+import com.example.restservice.model.Game;
 import com.example.restservice.service.DeveloperService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -67,7 +74,19 @@ public class DeveloperController {
 
     @RequestMapping(value = "{id}/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable("id") Long id) {
-        //TODO implement this
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        // configures settings from hibernate.cfg.xml
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+        SessionFactory sf = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        try (Session session = sf.openSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("from Game where dev.id = :id");
+            query.setParameter("id", id);
+            List<Game> games = query.list();
+            session.getTransaction().commit();
+            return new ResponseEntity<>(games.stream().map((game) -> modelMapper.map(game, GameDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
+        } catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
