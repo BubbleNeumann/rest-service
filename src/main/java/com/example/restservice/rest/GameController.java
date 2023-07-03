@@ -2,9 +2,17 @@ package com.example.restservice.rest;
 
 
 import com.example.restservice.dto.GameDTO;
+import com.example.restservice.dto.TagDTO;
 import com.example.restservice.model.Game;
+import com.example.restservice.model.Tag;
 import com.example.restservice.service.DeveloperService;
 import com.example.restservice.service.GameService;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -78,5 +86,26 @@ public class GameController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(games.stream().map((game) -> modelMapper.map(game, GameDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
+    }
+
+    /**
+     * @param id - game id.
+     * @return all tags applied to the game with given id.
+     */
+    @RequestMapping(value = "{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TagDTO>> getAllTags(@PathVariable("id") Long id) {
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+        SessionFactory sf = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        try (Session session = sf.openSession()) {
+            session.beginTransaction();
+            Query query = session.createQuery("from Tag as t inner join t.games as g where g.id = :id");
+            query.setParameter("id", id);
+            List<Tag> tags = query.list();
+            session.getTransaction().commit();
+            return new ResponseEntity<>(tags.stream().map((game) -> modelMapper.map(game, TagDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
+        } catch (Exception e) {
+            StandardServiceRegistryBuilder.destroy(registry);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

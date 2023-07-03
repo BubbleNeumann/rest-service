@@ -72,6 +72,10 @@ public class DeveloperController {
         return new ResponseEntity<>(devs.stream().map((dev) -> modelMapper.map(dev, DevDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
     }
 
+    /**
+     * @param id - developer id.
+     * @return all games by a developer if any were found.
+     */
     @RequestMapping(value = "{id}/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable("id") Long id) {
         // configures settings from hibernate.cfg.xml
