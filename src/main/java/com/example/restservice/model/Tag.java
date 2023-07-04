@@ -45,7 +45,7 @@ public class Tag extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tag tag = (Tag) o;
-        return Objects.equals(this.getId(), ((Tag) o).getId()) && Objects.equals(name, tag.name);
+        return Objects.equals(this.getId(), tag.getId()) && Objects.equals(name, tag.name);
     }
 
     @Override

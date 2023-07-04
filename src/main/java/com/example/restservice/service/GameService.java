@@ -3,6 +3,7 @@ package com.example.restservice.service;
 import com.example.restservice.model.Game;
 import com.example.restservice.repository.GameRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,9 @@ public class GameService implements IEntityService<Game> {
     }
 
     @Override
-    public List<Game> getAll() {
-        return repo.findAll();
+    public List<Game> getAll(Integer page) {
+        final int size = 5;
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        return repo.findAll(pageable).getContent();
     }
 }

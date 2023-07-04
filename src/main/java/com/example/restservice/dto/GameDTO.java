@@ -60,7 +60,6 @@ public class GameDTO {
         this.description = description;
     }
 
-
     @Override
     public String toString() {
         return "GameDTO{" +

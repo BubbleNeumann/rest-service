@@ -37,7 +37,7 @@ public class TagController {
     private ModelMapper modelMapper;
 
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDTO> getTag(@PathVariable("id") Long tagId) {
         if (tagId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -59,7 +59,7 @@ public class TagController {
         return new ResponseEntity<>(tagDTO, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDTO> deleteTag(@PathVariable("id") Long id) {
         Tag tag = this.tagService.getById(id);
         if (tag == null) {
@@ -92,9 +92,9 @@ public class TagController {
         return new ResponseEntity<>(modelMapper.map(tag, TagDTO.class), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TagDTO>> getAll() {
-        List<Tag> tags = this.tagService.getAll();
+    @RequestMapping(value = {"", "{page}"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TagDTO>> getAll(@PathVariable(value = "page", required = false) Integer pageNum) {
+        List<Tag> tags = this.tagService.getAll(pageNum == null ? 1 : pageNum);
         if (tags.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -107,7 +107,7 @@ public class TagController {
      * @param id - tag id.
      * @return all games marked with the tag with given id.
      */
-    @RequestMapping(value = "{id}/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable("id") Long id) {
         List<Game> games = getAllGamesWithTag(id);
         if (games.isEmpty()) {

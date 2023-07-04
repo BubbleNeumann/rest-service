@@ -3,6 +3,7 @@ package com.example.restservice.service;
 import com.example.restservice.model.Developer;
 import com.example.restservice.repository.DeveloperRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,9 @@ public class DeveloperService implements IEntityService<Developer> {
     }
 
     @Override
-    public List<Developer> getAll() {
-        return repo.findAll();
+    public List<Developer> getAll(Integer page) {
+        final int size = 5;
+        PageRequest pageable = PageRequest.of(page - 1, size);
+        return repo.findAll(pageable).getContent();
     }
 }

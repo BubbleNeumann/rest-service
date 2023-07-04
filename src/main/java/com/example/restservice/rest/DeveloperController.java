@@ -31,7 +31,7 @@ public class DeveloperController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DevDTO> getDeveloper(@PathVariable("id") Long devId) {
         if (devId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -53,7 +53,7 @@ public class DeveloperController {
         return new ResponseEntity<>(devDTO, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DevDTO> deleteDeveloper(@PathVariable("id") Long id) {
         Developer dev = this.devService.getById(id);
         if (dev == null) {
@@ -63,9 +63,9 @@ public class DeveloperController {
         return new ResponseEntity<>(modelMapper.map(dev, DevDTO.class), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<DevDTO>> getAll() {
-        List<Developer> devs = this.devService.getAll();
+    @RequestMapping(value = {"", "{page}"}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<DevDTO>> getAll(@PathVariable(value = "page", required = false) Integer pageNum) {
+        List<Developer> devs = this.devService.getAll(pageNum == null ? 1 : pageNum);
         if (devs.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

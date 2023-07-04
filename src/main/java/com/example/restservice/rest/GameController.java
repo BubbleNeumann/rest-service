@@ -43,7 +43,7 @@ public class GameController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDTO> getGame(@PathVariable("id") Long gameId) {
         if (gameId == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -53,7 +53,7 @@ public class GameController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
-        // convert tag objects into tag ids, so we pass less info
+        // convert tag objects into tag ids, so we pass less data
         gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
         return new ResponseEntity<>(gameDTO, HttpStatus.OK);
     }
@@ -111,7 +111,7 @@ public class GameController {
         return new ResponseEntity<>(gameDTO, headers, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDTO> deleteGame(@PathVariable("id") Long id) {
         Game game = this.gameService.getById(id);
         if (game == null) {
@@ -121,9 +121,16 @@ public class GameController {
         return new ResponseEntity<>(modelMapper.map(game, GameDTO.class), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<GameDTO>> getAll() {
-        List<Game> games = this.gameService.getAll();
+    /**
+     * Endpoint for games.
+     * @param pageNum
+     * @return 5 db entries from ((pageNum - 1) * 5 + 1) to (pageNum * 5) inclusive.
+     */
+    @RequestMapping(value = {"{page}", ""}, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GameDTO>> getAll(@PathVariable(value = "page", required = false) Integer pageNum) {
+        // if the page number wasn't specified then just return the first page
+        System.out.println(pageNum);
+        List<Game> games = this.gameService.getAll(pageNum == null ? 1 : pageNum);
         if (games.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
