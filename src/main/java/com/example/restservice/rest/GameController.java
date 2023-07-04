@@ -3,10 +3,12 @@ package com.example.restservice.rest;
 
 import com.example.restservice.dto.GameDTO;
 import com.example.restservice.dto.TagDTO;
+import com.example.restservice.model.BaseEntity;
 import com.example.restservice.model.Game;
 import com.example.restservice.model.Tag;
 import com.example.restservice.service.DeveloperService;
 import com.example.restservice.service.GameService;
+import com.example.restservice.service.TagService;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
@@ -21,7 +23,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +36,9 @@ public class GameController {
 
     @Autowired
     private DeveloperService devService;
+
+    @Autowired
+    private TagService tagService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -45,13 +52,16 @@ public class GameController {
         if (game == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(modelMapper.map(game, GameDTO.class), HttpStatus.OK);
+        GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
+        // convert tag objects into tag ids, so we pass less info
+        gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
+        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
     }
 
     /**
      * Creates a new entry in the games table. Checks for dev_id in the developers table,
-     * returns FAILED_DEPENDENCY status if developer with corresponding id wasn't found.
-     * Fetches Developer object from db based on gameDTO's devId.
+     * returns FAILED_DEPENDENCY status if developer  or one of the tags with corresponding id wasn't found.
+     * Fetches Developer and Tag objects from db based on gameDTO's devId and tagIds.
      */
     @RequestMapping(value = "", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDTO> saveGame(@RequestBody GameDTO gameDTO) {
@@ -65,6 +75,38 @@ public class GameController {
         }
         Game game = modelMapper.map(gameDTO, Game.class);
         game.setDev(devService.getById(gameDTO.getDevId()));
+        // check that all tag ids are valid and already exist
+        Set<Long> tagIds = gameDTO.getTagIds();
+        for (Long id : tagIds) {
+            if (tagService.getById(id) == null) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+        }
+        game.setTags(tagIds.stream().map((id) -> this.tagService.getById(id)).collect(Collectors.toSet()));
+        this.gameService.save(game);
+        return new ResponseEntity<>(gameDTO, headers, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GameDTO> updateGame(@RequestBody GameDTO gameDTO) {
+        if (gameDTO == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        // check if developer exists
+        if (devService.getById(gameDTO.getDevId()) == null) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+        Game game = modelMapper.map(gameDTO, Game.class);
+        game.setDev(devService.getById(gameDTO.getDevId()));
+        // check that all tag ids are valid and already exist
+        Set<Long> tagIds = gameDTO.getTagIds();
+        for (Long id : tagIds) {
+            if (tagService.getById(id) == null) {
+                return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+            }
+        }
+        game.setTags(tagIds.stream().map((id) -> this.tagService.getById(id)).collect(Collectors.toSet()));
         this.gameService.save(game);
         return new ResponseEntity<>(gameDTO, headers, HttpStatus.CREATED);
     }
@@ -85,10 +127,18 @@ public class GameController {
         if (games.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(games.stream().map((game) -> modelMapper.map(game, GameDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
+        List<GameDTO> gameDTOS = new ArrayList<>();
+        for (Game game : games) {
+            GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
+            gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
+            gameDTOS.add(gameDTO);
+        }
+        return new ResponseEntity<>(gameDTOS, HttpStatus.OK);
     }
 
     /**
+     * Fetches all tags of the game.
+     *
      * @param id - game id.
      * @return all tags applied to the game with given id.
      */

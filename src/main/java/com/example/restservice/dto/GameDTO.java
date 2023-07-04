@@ -2,6 +2,7 @@ package com.example.restservice.dto;
 
 
 import java.util.Date;
+import java.util.Set;
 
 public class GameDTO {
     private Long id;
@@ -9,6 +10,15 @@ public class GameDTO {
     private Date releaseDate;
     private Long devId;
     private String description;
+    private Set<Long> tagIds;
+
+    public Set<Long> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(Set<Long> tagIds) {
+        this.tagIds = tagIds;
+    }
 
     public Long getId() {
         return id;
@@ -49,6 +59,7 @@ public class GameDTO {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     @Override
     public String toString() {

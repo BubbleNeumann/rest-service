@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -34,7 +35,21 @@ public class Tag extends BaseEntity {
     @Override
     public String toString() {
         return "Tag{" +
+                "id='" + this.getId() + '\'' +
                 "name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return Objects.equals(this.getId(), ((Tag) o).getId()) && Objects.equals(name, tag.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId()) + Objects.hash(name);
     }
 }

@@ -20,5 +20,6 @@
         <!-- Names the annotated entity class -->
         <mapping class="com.example.restservice.model.Game"/>
         <mapping class="com.example.restservice.model.Developer"/>
+        <mapping class="com.example.restservice.model.Tag"/>
     </session-factory>
 </hibernate-configuration>
