@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,10 +51,7 @@ public class GameController {
         if (game == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
-        // convert tag objects into tag ids, so we pass less data
-        gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
-        return new ResponseEntity<>(gameDTO, HttpStatus.OK);
+        return new ResponseEntity<>(castToDTO(game), HttpStatus.OK);
     }
 
     /**
@@ -118,11 +114,12 @@ public class GameController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         this.gameService.delete(id);
-        return new ResponseEntity<>(modelMapper.map(game, GameDTO.class), HttpStatus.OK);
+        return new ResponseEntity<>(castToDTO(game), HttpStatus.OK);
     }
 
     /**
      * Endpoint for games.
+     *
      * @param pageNum
      * @return 5 db entries from ((pageNum - 1) * 5 + 1) to (pageNum * 5) inclusive.
      */
@@ -134,12 +131,7 @@ public class GameController {
         if (games.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<GameDTO> gameDTOS = new ArrayList<>();
-        for (Game game : games) {
-            GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
-            gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
-            gameDTOS.add(gameDTO);
-        }
+        List<GameDTO> gameDTOS = games.stream().map((this::castToDTO)).collect(Collectors.toList());
         return new ResponseEntity<>(gameDTOS, HttpStatus.OK);
     }
 
@@ -149,7 +141,7 @@ public class GameController {
      * @param id - game id.
      * @return all tags applied to the game with given id.
      */
-    @RequestMapping(value = "{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "id={id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TagDTO>> getAllTags(@PathVariable("id") Long id) {
         final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
         SessionFactory sf = new MetadataSources(registry).buildMetadata().buildSessionFactory();
@@ -159,10 +151,17 @@ public class GameController {
             query.setParameter("id", id);
             List<Tag> tags = query.list();
             session.getTransaction().commit();
-            return new ResponseEntity<>(tags.stream().map((game) -> modelMapper.map(game, TagDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
+            return new ResponseEntity<>(tags.stream().map((tag) -> modelMapper.map(tag, TagDTO.class)).collect(Collectors.toList()), HttpStatus.OK);
         } catch (Exception e) {
             StandardServiceRegistryBuilder.destroy(registry);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    private GameDTO castToDTO(Game game) {
+        GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
+        // convert tag objects into tag ids, so we pass less data
+        gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
+        return gameDTO;
     }
 }
