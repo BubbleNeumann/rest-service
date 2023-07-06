@@ -13,7 +13,7 @@ public class RestServiceApplication {
 
     /**
      * Used for the automatic conversion from db entities objects to entity DTOs.
-     * Called from convertToDTO() & convertToEntity() in corresponding controllers.
+     * Used in entity services.
      */
     @Bean
     public ModelMapper modelMapper() {

@@ -1,16 +1,15 @@
 package com.example.restservice.service;
 
-import com.example.restservice.model.BaseEntity;
-import org.springframework.data.domain.Pageable;
+import com.example.restservice.dto.BaseDTO;
 
 import java.util.List;
 
-public interface IEntityService<T extends BaseEntity> {
+public interface IEntityService<T extends BaseDTO> {
     T getById(Long id);
 
     void save(T entity);
 
     void delete(Long id);
 
-    List<T> getAll(Integer page);
+    List<T> getAll(Integer page, Integer size);
 }

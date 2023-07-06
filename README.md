@@ -15,12 +15,16 @@
 - Взаимодействие осуществляется через REST запросы в формате JSON
 - Дополнительно описать REST-endpoint для запроса всего списка сущностей (к примеру всех книг) с возможностью пагинации (запрос с 1 по 100 запись, с 101 по 200 и тд) с возможностью сортировки
 - Коды возврата REST запросов должны возвращать соответствующие коды HTTP
+ 
+---
+
+![db-schema.png](pictures/db-schema.png)
 
 ### Demo
-![demo-get.png](demo-get.png)
+![demo-get.png](pictures/demo-get.png)
 
-![demo-post.png](demo-post.png)
+![demo-post.png](pictures/demo-post.png)
 
-![demo-put.png](demo-put.png)
+![demo-put.png](pictures/demo-put.png)
 
-![demo-del.png](demo-del.png)
+![demo-del.png](pictures/demo-del.png)

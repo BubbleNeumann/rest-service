@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Objects;
 import java.util.Set;
@@ -14,6 +16,7 @@ public class Tag extends BaseEntity {
     @Column(name = "name")
     private String name;
     @ManyToMany(mappedBy = "tags")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Game> games;
 
     public Set<Game> getGames() {

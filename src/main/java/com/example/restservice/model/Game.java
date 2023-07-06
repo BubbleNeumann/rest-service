@@ -1,6 +1,8 @@
 package com.example.restservice.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -19,7 +21,12 @@ public class Game extends BaseEntity {
     private String description;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "games_tags", joinColumns = {@JoinColumn(name = "game_id")}, inverseJoinColumns = {@JoinColumn(name = "tags_id")})
+    @JoinTable(
+            name = "games_tags",
+            joinColumns = {@JoinColumn(name = "game_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tags_id")}
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Tag> tags = new HashSet<>();
 
     public Developer getDev() {
@@ -62,8 +69,17 @@ public class Game extends BaseEntity {
         this.title = title;
     }
 
+    public void removeTag(Tag tag) {
+        this.tags.remove(tag);
+    }
+
     @Override
     public String toString() {
-        return "Game{" + "title='" + title + '\'' + ", releaseDate=" + releaseDate + ", dev=" + dev + ", description='" + description + "'}";
+        return "Game{" +
+                "title='" + title + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", dev=" + dev +
+                ", description='" + description +
+                "'}";
     }
 }

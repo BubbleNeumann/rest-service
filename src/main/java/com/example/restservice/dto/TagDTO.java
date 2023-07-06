@@ -1,16 +1,7 @@
 package com.example.restservice.dto;
 
-public class TagDTO {
-    private Long id;
+public class TagDTO extends BaseDTO {
     private String name;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -18,5 +9,13 @@ public class TagDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "TagDTO{" +
+                "id=" + this.getId() +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
