@@ -1,113 +1,177 @@
 databaseChangeLog:
-  - logicalFilePath: db/changelog/db.changelog-games1.yaml
-#  - changeSet:
-##      games table (id, title, release_date, description)
-#      id: 1
-#      author: root
-#      changes:
-#        - createTable:
-#            tableName: games
-#            columns:
-#              - column:
-#                  name: id
-#                  type: BIGINT
-#                  autoIncrement: true
-#                  constraints:
-#                    primaryKey: true
-#                    nullable: false
-#              - column:
-#                  name: title
-#                  type: varchar(50)
-#                  constraints:
-#                    unique: true
-#                    nullable: false
-#              - column:
-#                  name: release_date
-#                  type: date
-#                  constraints:
-#              - column:
-#                  name: dev_id
-#                  type: BIGINT
-#                  constraints:
-#                    nullable: false
-#                    foreignKeyName: fk_dev_id
-#              - column:
-#                  name: description
-#                  type: varchar(500)
-#  - changeSet:
-#      id: 2
-#      author: root
-#      changes:
-#        - createTable:
-#            tableName: tags
-#            columns:
-#              - column:
-#                  name: id
-#                  type: BIGINT
-#                  autoIncrement: true
-#                  constraints:
-#                    primaryKey: true
-#                    nullable: false
-#              - column:
-#                  name: name
-#                  type: varchar(50)
-#                  constraints:
-#                    unique: true
-#                    nullable: false
-#  - changeSet:
-#      id: 3
-#      author: root
-#      changes:
-#        - createTable:
-#            tableName: games_tags
-#            columns:
-#              - column:
-#                  name: game_id
-#                  type: BIGINT
-#                  constraints:
-#                    nullable: false
-#              - column:
-#                  name: tag_id
-#                  type: BIGINT
-#                  constraints:
-#                    nullable: false
-#  - changeSet:
-#      id: 4
-#      author: root
-#      changes:
-#        - createTable:
-#            tableName: developers
-#            columns:
-#              - column:
-#                  name: id
-#                  type: BIGINT
-#                  autoIncrement: true
-#                  constraints:
-#                    primaryKey: true
-#                    nullable: false
-#              - column:
-#                  name: name
-#                  type: varchar(50)
-#                  constraints:
-#                    unique: true
-#                    nullable: false
-#  -  changeSet:
-#       id:  5
-#       author: root
-#       changes:
-#         -  dropTable:
-#              tableName: developers
-#              cascadeConstrains: true
-#  -  changeSet:
-#       id:  7
-#       author: root
-#       changes:
-#         - dropColumn:
-#             columnName: dev_id
-#             tableName: games
-#         - addLookupTable:
-#            existingTableName: games
-#            existingColumnName: dev_id
-#            newTableName: developers
-#            newColumnName:  id
-#            newColumnDataType:  char(2)
+    - logicalFilePath: db/changelog/db.changelog-games1.yaml
+    - changeSet:
+          id: 1
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              autoIncrement: true
+                              constraints:
+                                  nullable: false
+                                  primaryKey: true
+                              name: id
+                              type: BIGINT
+                        - column:
+                              name: name
+                              type: VARCHAR(255)
+                    tableName: developers
+    - changeSet:
+          id: 2
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              name: next_val
+                              type: BIGINT
+                    tableName: developers_seq
+    - changeSet:
+          id: 3
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              name: dev_id
+                              type: BIGINT
+                        - column:
+                              autoIncrement: true
+                              constraints:
+                                  nullable: false
+                                  primaryKey: true
+                              name: id
+                              type: BIGINT
+                        - column:
+                              name: release_date
+                              type: date
+                        - column:
+                              name: description
+                              type: VARCHAR(255)
+                        - column:
+                              name: title
+                              type: VARCHAR(255)
+                    tableName: games
+    - changeSet:
+          id: 4
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              name: next_val
+                              type: BIGINT
+                    tableName: games_seq
+    - changeSet:
+          id: 5
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              constraints:
+                                  nullable: false
+                                  primaryKey: true
+                              name: game_id
+                              type: BIGINT
+                        - column:
+                              constraints:
+                                  nullable: false
+                                  primaryKey: true
+                              name: tags_id
+                              type: BIGINT
+                    tableName: games_tags
+    - changeSet:
+          id: 6
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              autoIncrement: true
+                              constraints:
+                                  nullable: false
+                                  primaryKey: true
+                              name: id
+                              type: BIGINT
+                        - column:
+                              name: name
+                              type: VARCHAR(255)
+                    tableName: tags
+    - changeSet:
+          id: 7
+          author: root
+          changes:
+              - createTable:
+                    columns:
+                        - column:
+                              name: next_val
+                              type: BIGINT
+                    tableName: tags_seq
+    - changeSet:
+          id: 8
+          author: root
+          changes:
+              - createIndex:
+                    columns:
+                        - column:
+                              name: dev_id
+                    indexName: FKdb764s27yum4awr2nl6lqtxiv
+                    tableName: games
+    - changeSet:
+          id: 9
+          author: root
+          changes:
+              - createIndex:
+                    columns:
+                        - column:
+                              name: tags_id
+                    indexName: FKpkd9ts8c536sj0v46iluf9234
+                    tableName: games_tags
+    - changeSet:
+          id: 10
+          author: root
+          changes:
+              - addForeignKeyConstraint:
+                    baseColumnNames: game_id
+                    baseTableName: games_tags
+                    constraintName: FK91add32bu5qd7v4y3h27poxh9
+                    deferrable: false
+                    initiallyDeferred: false
+                    onDelete: RESTRICT
+                    onUpdate: RESTRICT
+                    referencedColumnNames: id
+                    referencedTableName: games
+                    validate: true
+    - changeSet:
+          id: 11
+          author: root
+          changes:
+              - addForeignKeyConstraint:
+                    baseColumnNames: dev_id
+                    baseTableName: games
+                    constraintName: FKdb764s27yum4awr2nl6lqtxiv
+                    deferrable: false
+                    initiallyDeferred: false
+                    onDelete: RESTRICT
+                    onUpdate: RESTRICT
+                    referencedColumnNames: id
+                    referencedTableName: developers
+                    validate: true
+    - changeSet:
+          id: 12
+          author: root
+          changes:
+              - addForeignKeyConstraint:
+                    baseColumnNames: tags_id
+                    baseTableName: games_tags
+                    constraintName: FKpkd9ts8c536sj0v46iluf9234
+                    deferrable: false
+                    initiallyDeferred: false
+                    onDelete: RESTRICT
+                    onUpdate: RESTRICT
+                    referencedColumnNames: id
+                    referencedTableName: tags
+                    validate: true
+

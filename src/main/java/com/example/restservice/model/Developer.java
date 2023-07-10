@@ -8,16 +8,17 @@ import java.util.Set;
 @Table(name = "developers")
 public class Developer extends BaseEntity {
     private String name;
-//    @OneToMany(fetch = FetchType.EAGER, mappedBy = "games", cascade = CascadeType.ALL)
-//    private Set<Game> games;
 
-//    public Set<Game> getGames() {
-//        return games;
-//    }
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "dev", cascade = CascadeType.ALL)
+    private Set<Game> games;
 
-//    public void setGames(Set<Game> games) {
-//        this.games = games;
-//    }
+    public Set<Game> getGames() {
+        return games;
+    }
+
+    public void setGames(Set<Game> games) {
+        this.games = games;
+    }
 
     public String getName() {
         return name;

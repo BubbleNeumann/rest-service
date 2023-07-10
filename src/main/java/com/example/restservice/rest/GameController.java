@@ -5,12 +5,14 @@ import com.example.restservice.dto.GameDTO;
 import com.example.restservice.dto.TagDTO;
 import com.example.restservice.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -43,7 +45,7 @@ public class GameController {
         }
         HttpHeaders headers = new HttpHeaders();
         try {
-            this.gameService.save(gameDTO);
+            gameDTO.setId(this.gameService.save(gameDTO));
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
         }
@@ -71,22 +73,52 @@ public class GameController {
     }
 
     /**
-     * Endpoint for games.
-     * If page or size values wasn't specified, they default to 1.
      *
-     * @param pageNum
-     * @return 5 db entries from ((pageNum - 1) * 5 + 1) to (pageNum * 5) inclusive.
+     * @param pageNum page number to return. Defaults to 1 if null
+     * @param size number of elements on one page. Defaults to 1 if null
+     * @return
      */
     @RequestMapping(
-            value = {"page={page}/size={size}", "page={page}", "size={size}", ""},
+            value = {
+                    "page={page}/size={size}/sort={sort}/prop={prop}",
+                    "size={size}/sort={sort}/prop={prop}",
+                    "page={page}",
+                    ""
+            },
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<GameDTO>> getAll(
             @PathVariable(value = "page", required = false) Integer pageNum,
-            @PathVariable(value = "size", required = false) Integer size
+            @PathVariable(value = "size", required = false) Integer size,
+            @PathVariable(value = "sort", required = false) String sort,
+            @PathVariable(value = "prop", required = false) String prop
     ) {
-        // if the page number wasn't specified then just return the first page
+        if (sort != null) {
+            Sort.Direction dir;
+            if (sort.equals("asc")) {
+                dir = Sort.Direction.ASC;
+            } else if (sort.equals("desc")) {
+                dir = Sort.Direction.DESC;
+            } else {
+                // sort option isn't correct
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            try {
+                List<GameDTO> gameDTOs = this.gameService.getAll(
+                        pageNum == null ? 1 : pageNum,
+                        size == null ? 1 : size,
+                        Sort.by(dir, prop)
+                );
+                if (gameDTOs.isEmpty()) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+                return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
+            } catch (Exception e) {
+                // props aren't correct
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
         List<GameDTO> gameDTOs = this.gameService.getAll(
                 pageNum == null ? 1 : pageNum,
                 size == null ? 1 : size
@@ -103,12 +135,20 @@ public class GameController {
      * @param id - game id.
      * @return all tags applied to the game with given id.
      */
-    @RequestMapping(value = "id={id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            value = "id={id}/tags",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<List<TagDTO>> getAllTags(@PathVariable("id") Long id) {
-        List<TagDTO> tagDTOs = this.gameService.getAllTags(id);
-        if (tagDTOs.isEmpty()) {
+        try {
+            List<TagDTO> tagDTOs = this.gameService.getAllTags(id);
+            if (tagDTOs.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(tagDTOs, HttpStatus.OK);
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(tagDTOs, HttpStatus.OK);
     }
 }

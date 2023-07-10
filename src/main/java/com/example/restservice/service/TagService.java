@@ -2,6 +2,7 @@ package com.example.restservice.service;
 
 import com.example.restservice.dto.GameDTO;
 import com.example.restservice.dto.TagDTO;
+import com.example.restservice.model.BaseEntity;
 import com.example.restservice.model.Tag;
 import com.example.restservice.model.Game;
 import com.example.restservice.repository.GameRepo;
@@ -32,8 +33,9 @@ public class TagService implements IEntityService<TagDTO> {
     }
 
     @Override
-    public void save(TagDTO tagDTO) {
-        repo.save(modelMapper.map(tagDTO, Tag.class));
+    public Long save(TagDTO tagDTO) {
+        Tag tag = repo.saveAndFlush(modelMapper.map(tagDTO, Tag.class));
+        return tag.getId();
     }
 
     @Override
@@ -57,10 +59,20 @@ public class TagService implements IEntityService<TagDTO> {
         return tags.stream().map((tag) -> modelMapper.map(tag, TagDTO.class)).collect(Collectors.toList());
     }
 
-    public List<GameDTO> getAllGames(Long tagId) {
-        return repo.getAllGames(tagId)
+    public List<GameDTO> getAllGames(Long tagId) throws RuntimeException {
+        Tag tag = repo.findById(tagId).orElse(null);
+        if (tag == null) {
+            throw new RuntimeException("tag wasn't found");
+        }
+        return tag.getGames()
                 .stream()
-                .map((game) -> modelMapper.map(game, GameDTO.class))
+                .map(this::castGameToDTO)
                 .collect(Collectors.toList());
+    }
+
+    private GameDTO castGameToDTO(Game game) {
+        GameDTO gameDTO = modelMapper.map(game, GameDTO.class);
+        gameDTO.setTagIds(game.getTags().stream().map(BaseEntity::getId).collect(Collectors.toSet()));
+        return gameDTO;
     }
 }

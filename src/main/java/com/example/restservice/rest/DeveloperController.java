@@ -36,7 +36,7 @@ public class DeveloperController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         HttpHeaders headers = new HttpHeaders();
-        this.devService.save(devDTO);
+        devDTO.setId(this.devService.save(devDTO));
         return new ResponseEntity<>(devDTO, headers, HttpStatus.CREATED);
     }
 

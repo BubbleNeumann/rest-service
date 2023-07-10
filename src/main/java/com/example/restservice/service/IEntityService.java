@@ -7,7 +7,7 @@ import java.util.List;
 public interface IEntityService<T extends BaseDTO> {
     T getById(Long id);
 
-    void save(T entity);
+    Long save(T entity);
 
     void delete(Long id);
 

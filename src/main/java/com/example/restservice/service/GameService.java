@@ -11,6 +11,7 @@ import org.hibernate.service.internal.ServiceDependencyException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,10 +42,10 @@ public class GameService implements IEntityService<GameDTO> {
      * Saves game object to db.
      * Fetches Developer and Tag objects from db based on gameDTO's devId and tagIds.
      * @param gameDTO - object to parse.
-     * @throws ServiceDependencyException in case developer or one of the tags wasn't found in the db.
+     * @throws RuntimeException in case developer or one of the tags wasn't found in the db.
      */
     @Override
-    public void save(GameDTO gameDTO) throws RuntimeException {
+    public Long save(GameDTO gameDTO) throws RuntimeException {
         Game game = modelMapper.map(gameDTO, Game.class);
         // check if developer exists
         if (devService.getById(gameDTO.getDevId()) == null) {
@@ -59,9 +60,9 @@ public class GameService implements IEntityService<GameDTO> {
             }
         }
         game.setTags(tagIds.stream().map((id) -> modelMapper.map(this.tagService.getById(id), Tag.class)).collect(Collectors.toSet()));
-        repo.save(game);
+        game = repo.saveAndFlush(game);
+        return game.getId();
     }
-
 
     @Override
     public void delete(Long id) {
@@ -75,8 +76,23 @@ public class GameService implements IEntityService<GameDTO> {
         return games.stream().map(this::castToDTO).collect(Collectors.toList());
     }
 
-    public List<TagDTO> getAllTags(Long gameId) {
-        List<Tag> tags = repo.getAllTags(gameId);
+    public List<GameDTO> getAll(Integer page, Integer size, Sort sort) {
+        PageRequest pageable = PageRequest.of(page - 1, size, sort);
+        List<Game> games = repo.findAll(pageable).getContent();
+        return games.stream().map(this::castToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     *
+     * @param gameId
+     * @throws RuntimeException if game with given id wasn't found in the db.
+     */
+    public List<TagDTO> getAllTags(Long gameId) throws RuntimeException{
+        Game game = repo.findById(gameId).orElse(null);
+        if (game == null) {
+            throw new RuntimeException("game wasn't found");
+        }
+        Set<Tag> tags = game.getTags();
         return tags.stream().map((tag) -> modelMapper.map(tag, TagDTO.class)).collect(Collectors.toList());
     }
 

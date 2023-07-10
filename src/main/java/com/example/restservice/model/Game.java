@@ -16,6 +16,7 @@ public class Game extends BaseEntity {
     @Column(name = "release_date", columnDefinition = "DATE")
     private Date releaseDate;
     @ManyToOne
+    @JoinColumn(name="dev_id", nullable=false)
     private Developer dev;
     @Column(name = "description")
     private String description;

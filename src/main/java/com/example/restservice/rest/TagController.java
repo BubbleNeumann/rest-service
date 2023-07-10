@@ -36,7 +36,7 @@ public class TagController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         HttpHeaders headers = new HttpHeaders();
-        this.tagService.save(tagDTO);
+        tagDTO.setId(this.tagService.save(tagDTO));
         return new ResponseEntity<>(tagDTO, headers, HttpStatus.CREATED);
     }
 
@@ -77,10 +77,14 @@ public class TagController {
      */
     @RequestMapping(value = "id={id}/games", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameDTO>> getAllGames(@PathVariable("id") Long id) {
-        List<GameDTO> gameDTOs = this.tagService.getAllGames(id);
-        if (gameDTOs.isEmpty()) {
+        try {
+            List<GameDTO> gameDTOs = this.tagService.getAllGames(id);
+            if (gameDTOs.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
     }
 }
