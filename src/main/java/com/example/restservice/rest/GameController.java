@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,60 +72,45 @@ public class GameController {
     }
 
     /**
-     *
      * @param pageNum page number to return. Defaults to 1 if null
-     * @param size number of elements on one page. Defaults to 1 if null
+     * @param size    number of elements on one page. Defaults to 1 if null
      * @return
      */
     @RequestMapping(
-            value = {
-                    "page={page}/size={size}/sort={sort}/prop={prop}",
-                    "size={size}/sort={sort}/prop={prop}",
-                    "page={page}",
-                    ""
-            },
+            value = {""},
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<GameDTO>> getAll(
-            @PathVariable(value = "page", required = false) Integer pageNum,
-            @PathVariable(value = "size", required = false) Integer size,
-            @PathVariable(value = "sort", required = false) String sort,
-            @PathVariable(value = "prop", required = false) String prop
+            @RequestParam(value = "page", defaultValue = "1", required = false) Integer pageNum,
+            @RequestParam(value = "size", defaultValue = "1", required = false) Integer size,
+            @RequestParam(value = "sort", defaultValue = "desc", required = false) String sort,
+            @RequestParam(value = "prop", defaultValue = "id", required = false) String prop
     ) {
-        if (sort != null) {
-            Sort.Direction dir;
-            if (sort.equals("asc")) {
-                dir = Sort.Direction.ASC;
-            } else if (sort.equals("desc")) {
-                dir = Sort.Direction.DESC;
-            } else {
-                // sort option isn't correct
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            try {
-                List<GameDTO> gameDTOs = this.gameService.getAll(
-                        pageNum == null ? 1 : pageNum,
-                        size == null ? 1 : size,
-                        Sort.by(dir, prop)
-                );
-                if (gameDTOs.isEmpty()) {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-                return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
-            } catch (Exception e) {
-                // props aren't correct
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+        List<GameDTO> gameDTOs;
+        Sort.Direction dir;
+        if (sort.equals("asc")) {
+            dir = Sort.Direction.ASC;
+        } else if (sort.equals("desc")) {
+            dir = Sort.Direction.DESC;
+        } else {
+            // sort option isn't correct
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        List<GameDTO> gameDTOs = this.gameService.getAll(
-                pageNum == null ? 1 : pageNum,
-                size == null ? 1 : size
-        );
-        if (gameDTOs.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            gameDTOs = this.gameService.getAll(
+                    pageNum == null ? 1 : pageNum,
+                    size == null ? 1 : size,
+                    Sort.by(dir, prop)
+            );
+            if (gameDTOs.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
+        } catch (Exception e) {
+            // props aren't correct
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(gameDTOs, HttpStatus.OK);
     }
 
     /**

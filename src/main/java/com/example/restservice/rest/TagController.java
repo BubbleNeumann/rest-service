@@ -39,7 +39,15 @@ public class TagController {
         tagDTO.setId(this.tagService.save(tagDTO));
         return new ResponseEntity<>(tagDTO, headers, HttpStatus.CREATED);
     }
-
+    @RequestMapping(value = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TagDTO> updateTag(@RequestBody TagDTO tagDTO) {
+        if (tagDTO == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        this.tagService.save(tagDTO);
+        return new ResponseEntity<>(tagDTO, headers, HttpStatus.CREATED);
+    }
     @RequestMapping(value = "id={id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TagDTO> deleteTag(@PathVariable("id") Long id) {
         TagDTO tagDTO = this.tagService.getById(id);
@@ -51,18 +59,15 @@ public class TagController {
     }
 
     @RequestMapping(
-            value = {"", "page={page}", "size={size}", "page={page}/size={size}"},
+            value = {""},
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<TagDTO>> getAll(
-            @PathVariable(value = "page", required = false) Integer pageNum,
-            @PathVariable(value = "size", required = false) Integer size
+            @RequestParam(value = "page", defaultValue = "1", required = false) Integer pageNum,
+            @RequestParam(value = "size", defaultValue = "1", required = false) Integer size
     ) {
-        List<TagDTO> tagDTOs = this.tagService.getAll(
-                pageNum == null ? 1 : pageNum,
-                size == null ? 1 : size
-        );
+        List<TagDTO> tagDTOs = this.tagService.getAll(pageNum, size);
         if (tagDTOs.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

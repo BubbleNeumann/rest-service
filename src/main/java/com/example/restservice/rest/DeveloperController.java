@@ -2,6 +2,7 @@ package com.example.restservice.rest;
 
 import com.example.restservice.dto.DevDTO;
 import com.example.restservice.dto.GameDTO;
+import com.example.restservice.dto.TagDTO;
 import com.example.restservice.service.DeveloperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +41,16 @@ public class DeveloperController {
         return new ResponseEntity<>(devDTO, headers, HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = "", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<DevDTO> updateDeveloper(@RequestBody DevDTO devDTO) {
+        if (devDTO == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        this.devService.save(devDTO);
+        return new ResponseEntity<>(devDTO, headers, HttpStatus.CREATED);
+    }
+
     @RequestMapping(value = "id={id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DevDTO> deleteDeveloper(@PathVariable("id") Long id) {
         DevDTO devDTO = this.devService.getById(id);
@@ -51,18 +62,15 @@ public class DeveloperController {
     }
 
     @RequestMapping(
-            value = {"", "page={page}", "size={size}", "page={page}/size={size}"},
+            value = {""},
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<DevDTO>> getAll(
-            @PathVariable(value = "page", required = false) Integer pageNum,
-            @PathVariable(value = "size", required = false) Integer size
+            @RequestParam(value = "page", defaultValue = "1", required = false) Integer pageNum,
+            @RequestParam(value = "size", defaultValue = "1", required = false) Integer size
     ) {
-        List<DevDTO> devDTOs = this.devService.getAll(
-                pageNum == null ? 1 : pageNum,
-                size == null ? 1 : size
-        );
+        List<DevDTO> devDTOs = this.devService.getAll(pageNum, size);
         if (devDTOs.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
